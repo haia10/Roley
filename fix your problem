@@ -1,0 +1,92 @@
+public class LoginActivity extends AppCompatActivity {
+    FirebaseAuth mAuth;
+    EditText mEmailET,mPasswordET;
+    TextView notHaveAccountTv;
+    Button mLoginBtn;
+    ProgressBar progressBar;
+    ProgressDialog progressDialog;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+
+
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle("Login");
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowHomeEnabled(true);
+
+        mAuth = FirebaseAuth.getInstance();
+        mEmailET =findViewById(R.id.LG_ET_EMAIL);
+        mPasswordET = findViewById(R.id.LG_ET_PASSWORD);
+        notHaveAccountTv = findViewById(R.id.LG_TV_REGISTER);
+        mLoginBtn = findViewById(R.id.LG_BTN_LOGIN);
+
+
+        mLoginBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String email = mEmailET.getText().toString();
+                String password = mPasswordET.getText().toString().trim();
+                if (TextUtils.isEmpty(email)){
+                    mEmailET.setError("Email Required");
+                    return;
+                }
+                if (TextUtils.isEmpty(password)){
+                    mPasswordET.setError("Password Required");
+                    return;
+                }
+
+                if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    mEmailET.setError("Invaild Email");
+                    return;
+                }
+
+                else if (password.length()<6){
+
+                        mPasswordET.setError("Password length at least 6 characters");
+                        return;
+
+                }
+                mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if(task.isSuccessful()){
+                            Toast.makeText(LoginActivity.this,"Logged in successfully",Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(LoginActivity.this,ProfileActivity.class));
+                        }else{
+                            Toast.makeText(LoginActivity.this,"Failed",Toast.LENGTH_SHORT).show();
+
+
+                        }
+                    }
+                });
+
+
+
+
+            }
+        });
+        notHaveAccountTv.setOnClickListener(    new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(LoginActivity.this,RegisterActivity.class));
+            }
+        });
+
+    }
+
+
+
+
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return super.onSupportNavigateUp();
+    }
+
+}
